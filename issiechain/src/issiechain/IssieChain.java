@@ -1,43 +1,42 @@
 
 package issiechain;
+
 import java.util.ArrayList;
-import com.google.gson.GsonBuilder;
+import java.security.Security;
+
+
 
 public class IssieChain {
 	
 	public static ArrayList<Block> blockchain = new ArrayList<Block>();
 	public static int difficulty = 5;
+	public static Wallet JamesWallet;
+	public static Wallet IssieWallet;
 
 	public static void main(String[] args) {	
-		//add our blocks to the block chain ArrayList:
+		//Setup Bouncey castle as a Security Provider
+		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider()); 
+		//Create wallets
+		JamesWallet = new Wallet();
+		IssieWallet = new Wallet();
+		//Test Public and Private keys
+		System.out.println("James' Private Key = : " +
+				StringUtil.getStringFromKey(JamesWallet.privateKey));
+		System.out.println("James' Public Key = : " + 
+				StringUtil.getStringFromKey(JamesWallet.publicKey));
+		System.out.println("Issies Private Key = : " + 
+				StringUtil.getStringFromKey(IssieWallet.privateKey));
+		System.out.println("Issies Public Key = : " + 
+				StringUtil.getStringFromKey(IssieWallet.publicKey));
 		
-		blockchain.add(new Block("Hi Issie..... Im the Genesis...or First Block", "0"));
-		System.out.println("Trying to Mine block 1... ");
-		blockchain.get(0).mineBlock(difficulty);
+		//Create a test transaction from JamesWallet to IssieWallet
+		Transaction transaction = new Transaction(JamesWallet.publicKey, IssieWallet.publicKey, 5, null);
+		transaction.generateSignature(JamesWallet.privateKey);
+		//Verify signature works from public key
+		System.out.println("Signature Verified: = " + transaction.verifiySignature());
+
 		
-		blockchain.add(new Block("Hi Issie..... Im the Second Block",blockchain.get(blockchain.size()-1).hash));
-		System.out.println("Trying to Mine block 2... ");
-		blockchain.get(1).mineBlock(difficulty);
-		
-		blockchain.add(new Block("Hi Issie..... Im the Third Block",blockchain.get(blockchain.size()-1).hash));
-		System.out.println("Trying to Mine block 3... ");
-		blockchain.get(2).mineBlock(difficulty);	
-		
-		blockchain.add(new Block("Hi Issie..... Im the Fourth Block",blockchain.get(blockchain.size()-1).hash));
-		System.out.println("Trying to Mine block 4... ");
-		blockchain.get(2).mineBlock(difficulty);	
-		
-		blockchain.add(new Block("Hi Issie..... Im the Fith",blockchain.get(blockchain.size()-1).hash));
-		System.out.println("Trying to Mine block 5... ");
-		blockchain.get(2).mineBlock(difficulty);	
-		
-		System.out.println("\nBlockchain is Valid: " + isChainValid());
-		
-		String blockchainJson = new GsonBuilder().setPrettyPrinting().create().toJson(blockchain);
-		System.out.println("\nThe block chain: ");
-		System.out.println(blockchainJson);
-	}
-	
+}
 	public static Boolean isChainValid() {
 		Block currentBlock; 
 		Block previousBlock;
