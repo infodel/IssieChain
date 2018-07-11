@@ -40,20 +40,20 @@ public class IssieChain {
 
 		//create genesis transaction, which sends 5000 IssieCoin to JamesWallet
 		genesisTransaction = new Transaction(coinbase.publicKey, JamesWallet.publicKey, 5000f, null);
+		System.out.println("\n\nGiving JamesWallet a Balance of 5000 IssieCoin");
 		genesisTransaction.generateSignature(coinbase.privateKey);	 //manually sign the genesis transaction	
 		genesisTransaction.transactionId = "0"; //manually set the transaction id
 		genesisTransaction.outputs.add(new TransactionOutput(genesisTransaction.reciepient, genesisTransaction.value, genesisTransaction.transactionId)); //manually add the Transactions Output
 		UTXOs.put(genesisTransaction.outputs.get(0).id, genesisTransaction.outputs.get(0)); //its important to store our first transaction in the UTXOs list.
 		
-		System.out.println("\nCreating and Mining Genesis block... ");
+		System.out.println("Creating and Mining Genesis block... ");
 		Block genesis = new Block("0");
 		genesis.addTransaction(genesisTransaction);
 		addBlock(genesis);
+		System.out.println("James' Wallet's balance is: " + JamesWallet.getBalance());
 
 		//testing
-		Block block1 = new Block(genesis.hash);
-		System.out.println("\nGiving JamesWallet a Balance of 5000 IssieCoin");
-		System.out.println("James' Wallet's balance is: " + JamesWallet.getBalance());
+		Block block1 = new Block(genesis.hash);;
 		System.out.println("\n\nJamesWallet is Attempting to send (44) IssieCoin to IssieWallet...");
 		block1.addTransaction(JamesWallet.sendFunds(IssieWallet.publicKey, 44f));
 		addBlock(block1);
@@ -70,6 +70,14 @@ public class IssieChain {
 		Block block3 = new Block(block2.hash);
 		System.out.println("\n\nIssieWallet is Attempting to send (20) IssieCoin to JamesWallet...");
 		block3.addTransaction(IssieWallet.sendFunds( JamesWallet.publicKey, 20));
+		addBlock(block3);
+		System.out.println("JamesWallet's balance is: " + JamesWallet.getBalance());
+		System.out.println("IssieWallet's balance is: " + IssieWallet.getBalance());
+		
+		Block block4 = new Block(block3.hash);
+		System.out.println("\n\nJamesWallet gives everything to IssieWallet (4976)....");
+		block4.addTransaction(JamesWallet.sendFunds( IssieWallet.publicKey, 4976));
+		addBlock(block4);
 		System.out.println("JamesWallet's balance is: " + JamesWallet.getBalance());
 		System.out.println("IssieWallet's balance is: " + IssieWallet.getBalance());
 		
